@@ -50,6 +50,9 @@ const Home = () => {
                   style={{ backgroundColor: color === 1 ? '#444' : '#fff' }}
                 />
               )}
+              {color === -1 && (
+                <div className={styles.disc} style={{ backgroundColor: '#e1ff00' }} />
+              )}
             </div>
           ))
         )}
