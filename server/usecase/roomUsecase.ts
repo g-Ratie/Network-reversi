@@ -1,9 +1,13 @@
 import type { UserId } from '$/commonTypesWithClient/branded';
-import { userColorRepository } from './userColorRepository';
-
+import type { RoomModel } from '$/commonTypesWithClient/models';
+import { roomRepository } from '$/repository/roomsRepository';
+import { roomIdParser } from '$/service/idParsers';
+import assert from 'assert';
+import { randomUUID } from 'crypto';
+import { userColorUsecase } from './userColorUsecase';
 export type BoardArray = number[][];
 
-const board: number[][] = [
+const initBoard = () => [
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, -1, 0, 0, 0],
@@ -13,7 +17,6 @@ const board: number[][] = [
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
 ];
-
 const directions = [
   [0, -1],
   [1, -1],
@@ -119,22 +122,46 @@ const resetSuggestions = (board: number[][]) => {
     });
   });
 };
-export const boardRepository = {
-  getBoard: () => board,
-  clickBoard: (x: number, y: number, userid: UserId): BoardArray => {
-    const userColor = userColorRepository.getUserColor(userid);
-    const enemyColor = userColor === 1 ? 2 : 1;
-    const canPutCells = CheckCanput(x, y, userColor, board);
 
-    if (canPutCells.length !== 0 && turnColor === userColor) {
+export const clickBoard = (x: number, y: number, userid: UserId, board: BoardArray): BoardArray => {
+  const userColor = userColorUsecase.getUserColor(userid);
+  const enemyColor = userColor === 1 ? 2 : 1;
+  const canPutCells = CheckCanput(x, y, userColor, board);
+
+  if (canPutCells.length !== 0 && turnColor === userColor) {
+    board[y][x] = userColor;
+    canPutCells.forEach(([y, x]) => {
       board[y][x] = userColor;
-      canPutCells.forEach(([y, x]) => {
-        board[y][x] = userColor;
-      });
-      turnColor = turnColor === 1 ? 2 : 1;
-      setSuggestions(board, enemyColor);
-    }
-    return board;
+    });
+    turnColor = turnColor === 1 ? 2 : 1;
+    setSuggestions(board, enemyColor);
+  }
+  return board;
+};
+export const roomUsecase = {
+  create: async (): Promise<RoomModel> => {
+    const newRoom: RoomModel = {
+      id: roomIdParser.parse(randomUUID()),
+      board: initBoard(),
+      status: 'waiting',
+      created: Date.now(),
+    };
+
+    await roomRepository.save(newRoom);
+
+    return newRoom;
   },
-  getTurnColor: () => turnColor,
+  clickBoard: async (x: number, y: number, userId: UserId): Promise<RoomModel> => {
+    const latest = await roomRepository.findLatest();
+
+    assert(latest, 'クリックできてるんだから部屋があるはず');
+
+    const newBoard: number[][] = clickBoard(x, y, userId, JSON.parse(JSON.stringify(latest.board)));
+
+    const newRoom: RoomModel = { ...latest, board: newBoard };
+
+    await roomRepository.save(newRoom);
+
+    return newRoom;
+  },
 };

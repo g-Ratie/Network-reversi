@@ -12,23 +12,29 @@ const Home = () => {
   const [board, setBoard] = useState<number[][]>([]);
   const [turn, setTurn] = useState<number>(0);
   const fetchBoard = async () => {
-    const board = await apiClient.board.$get().catch(returnNull);
+    const board = await apiClient.rooms.$get().catch(returnNull);
     if (board !== null) setBoard(board.board);
   };
+
   const clickCell = async (x: number, y: number) => {
-    await apiClient.board.post({ body: { x, y } });
+    await apiClient.rooms.board.post({ body: { x, y } });
     await fetchBoard();
     console.log('click', x, y);
   };
+
   const fetchTurn = async () => {
     const turn = await apiClient.turn.$get();
     if (turn !== null) setTurn(turn);
   };
+  const createRoom = async () => {
+    await apiClient.rooms.$post();
+  };
+
+  
 
   useEffect(() => {
     const getboard = setInterval(fetchBoard, 500);
     const getturn = setInterval(fetchTurn, 500);
-
     return () => {
       clearInterval(getboard);
       clearInterval(getturn);
@@ -58,6 +64,7 @@ const Home = () => {
         )}
       </div>
       <p>{turn === 1 ? '黒' : '白'}のターン</p>
+      <button onClick={createRoom}>部屋を作る</button>
     </>
   );
 };
