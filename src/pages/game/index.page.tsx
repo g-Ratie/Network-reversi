@@ -30,8 +30,6 @@ const Home = () => {
     await apiClient.rooms.$post();
   };
 
-  
-
   useEffect(() => {
     const getboard = setInterval(fetchBoard, 500);
     const getturn = setInterval(fetchTurn, 500);

@@ -40,7 +40,6 @@ const Home = () => {
 
   useEffect(() => {
     fetchTasks();
-    
   }, []);
 
   if (!tasks || !user) return <Loading visible />;
