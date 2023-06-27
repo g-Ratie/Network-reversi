@@ -5,7 +5,6 @@ import { userAtom } from 'src/atoms/user';
 import { Loading } from 'src/components/Loading/Loading';
 import { BasicHeader } from 'src/pages/@components/BasicHeader/BasicHeader';
 import { apiClient } from 'src/utils/apiClient';
-import { returnNull } from 'src/utils/returnNull';
 import styles from './roomid.module.css';
 
 const Home = () => {
@@ -13,9 +12,13 @@ const Home = () => {
   const router = useRouter();
   const [board, setBoard] = useState<number[][]>([]);
   const [turn, setTurn] = useState<number>(0);
+  const { roomid } = router.query;
+
   const fetchBoard = async () => {
-    const board = await apiClient.rooms.$get().catch(returnNull);
-    if (board !== null) setBoard(board.board);
+    if (typeof roomid !== 'string') return;
+    console.log('fetchBoard', roomid);
+    const room = await apiClient.rooms.post({ body: { roomid } });
+    if (board !== null) setBoard(room.body?.board ?? []);
   };
 
   const clickCell = async (x: number, y: number) => {
@@ -28,7 +31,6 @@ const Home = () => {
     const turn = await apiClient.turn.$get();
     if (turn !== null) setTurn(turn);
   };
-  const { roomid } = router.query;
 
   useEffect(() => {
     const getboard = setInterval(fetchBoard, 500);
@@ -38,9 +40,8 @@ const Home = () => {
       clearInterval(getturn);
     };
   }, []);
-  
 
-  if (!board || !user) return <Loading visible />;
+  if (!user) return <Loading visible />;
 
   return (
     <>

@@ -2,9 +2,10 @@ import type { RoomModel } from '$/commonTypesWithClient/models';
 
 export type Methods = {
   get: {
-    resBody: RoomModel | null;
+    resBody: RoomModel;
   };
   post: {
-    resBody: RoomModel;
+    reqBody: { roomid: string };
+    resBody: RoomModel | null;
   };
 };

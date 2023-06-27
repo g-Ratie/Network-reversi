@@ -1,8 +1,8 @@
 import type { RoomModel } from '$/commonTypesWithClient/models';
-import { roomIdParser } from '$/service/idParsers';
 import { prismaClient } from '$/service/prismaClient';
 import type { Room } from '@prisma/client';
 import { z } from 'zod';
+import { roomIdParser } from './../service/idParsers';
 
 const toRoomModel = (prismaRoom: Room): RoomModel => ({
   id: roomIdParser.parse(prismaRoom.roomId),
@@ -30,5 +30,11 @@ export const roomRepository = {
     });
     return room && toRoomModel(room);
   },
-  
+  getroom: async (roomid: string): Promise<RoomModel | null> => {
+    const roomId = roomIdParser.parse(roomid);
+    const room = await prismaClient.room.findUnique({
+      where: { roomId },
+    });
+    return room && toRoomModel(room);
+  },
 };

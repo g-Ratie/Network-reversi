@@ -11,7 +11,7 @@ const Home = () => {
   const router = useRouter();
 
   const createRoom = async () => {
-    const room = await apiClient.rooms.$post();
+    const room = await apiClient.rooms.$get();
     router.push(`/game/${room.id}`);
   };
 
