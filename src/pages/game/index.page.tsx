@@ -1,68 +1,32 @@
 import { useAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { userAtom } from 'src/atoms/user';
 import { Loading } from 'src/components/Loading/Loading';
 import { BasicHeader } from 'src/pages/@components/BasicHeader/BasicHeader';
 import { apiClient } from 'src/utils/apiClient';
-import { returnNull } from 'src/utils/returnNull';
 import styles from './index.module.css';
 
 const Home = () => {
   const [user] = useAtom(userAtom);
-  const [board, setBoard] = useState<number[][]>([]);
-  const [turn, setTurn] = useState<number>(0);
-  const fetchBoard = async () => {
-    const board = await apiClient.rooms.$get().catch(returnNull);
-    if (board !== null) setBoard(board.board);
-  };
+  const router = useRouter();
 
-  const clickCell = async (x: number, y: number) => {
-    await apiClient.rooms.board.post({ body: { x, y } });
-    await fetchBoard();
-    console.log('click', x, y);
-  };
-
-  const fetchTurn = async () => {
-    const turn = await apiClient.turn.$get();
-    if (turn !== null) setTurn(turn);
-  };
   const createRoom = async () => {
-    await apiClient.rooms.$post();
+    const room = await apiClient.rooms.$post();
+    router.push(`/game/${room.id}`);
   };
 
-  useEffect(() => {
-    const getboard = setInterval(fetchBoard, 500);
-    const getturn = setInterval(fetchTurn, 500);
-    return () => {
-      clearInterval(getboard);
-      clearInterval(getturn);
-    };
-  }, []);
-
-  if (!board || !user) return <Loading visible />;
+  if (!user) return <Loading visible />;
 
   return (
     <>
       <BasicHeader user={user} />
-      <div className={styles.board}>
-        {board.map((row, y) =>
-          row.map((color, x) => (
-            <div className={styles.cell} key={`${x}_${y}`} onClick={() => clickCell(x, y)}>
-              {color > 0 && (
-                <div
-                  className={styles.disc}
-                  style={{ backgroundColor: color === 1 ? '#444' : '#fff' }}
-                />
-              )}
-              {color === -1 && (
-                <div className={styles.disc} style={{ backgroundColor: '#e1ff00' }} />
-              )}
-            </div>
-          ))
-        )}
+      <div className={styles.box}>
+        <button className={styles.btn} onClick={createRoom}>
+          部屋を作る
+        </button>
+        <button className={styles.btn}>部屋を探す</button>
+        <button className={styles.btn}>続きから</button>
       </div>
-      <p>{turn === 1 ? '黒' : '白'}のターン</p>
-      <button onClick={createRoom}>部屋を作る</button>
     </>
   );
 };
