@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { userAtom } from 'src/atoms/user';
-import InfoPanel from 'src/components/Infopanel';
+import InfoPanel from 'src/components/game/Infopanel';
 import { Loading } from 'src/components/Loading/Loading';
 import { BasicHeader } from 'src/pages/@components/BasicHeader/BasicHeader';
 import { apiClient } from 'src/utils/apiClient';
@@ -23,7 +23,8 @@ const Home = () => {
   };
 
   const clickCell = async (x: number, y: number) => {
-    await apiClient.rooms.board.post({ body: { x, y } });
+    if (typeof roomid !== 'string') return;
+    await apiClient.rooms.board.post({ body: { x, y, roomid } });
     await fetchBoard();
     console.log('click', x, y);
   };

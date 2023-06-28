@@ -1,16 +1,28 @@
 import type { RoomModel } from '$/commonTypesWithClient/models';
+import { useAtom } from 'jotai';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { userAtom } from 'src/atoms/user';
 import { apiClient } from 'src/utils/apiClient';
 import styles from './gameListModal.module.css';
 
 const GameListModal = () => {
   const [roomDatas, setRoomDatas] = useState<RoomModel[]>();
   const [show, setShow] = useState(false);
+  const [user] = useAtom(userAtom);
+  const router = useRouter();
 
   const fetchRooms = async () => {
     const rooms = await apiClient.rooms.roomlist.$get();
     setRoomDatas(rooms);
   };
+  const joinRoom = async (roomid: string) => {
+    if (!user) return;
+    const joinroom = await apiClient.rooms.roomlist.$post({ body: { roomid } });
+    await apiClient.rooms.useronrooms.$post({ body: { roomid: joinroom.id, firebaseid: user.id } });
+    router.push(`/game/${roomid}`);
+  };
+
   useEffect(() => {
     const getRooms = setInterval(fetchRooms, 500);
     return () => {
@@ -27,7 +39,9 @@ const GameListModal = () => {
             <h3>ルームリスト</h3>
             <ul>
               {roomDatas.map((roomData) => (
-                <li key={roomData.id}>{roomData.id}</li>
+                <li key={roomData.id} onClick={() => joinRoom(roomData.id)}>
+                  {roomData.id}
+                </li>
               ))}
             </ul>
             <button onClick={() => setShow(false)}>close</button>
@@ -36,7 +50,11 @@ const GameListModal = () => {
       </>
     );
   else {
-    return <button onClick={() => setShow(true)}>Click</button>;
+    return (
+      <button className={styles.btn} onClick={() => setShow(true)}>
+        部屋探す
+      </button>
+    );
   }
 };
 

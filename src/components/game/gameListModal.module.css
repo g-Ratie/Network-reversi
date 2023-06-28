@@ -37,3 +37,22 @@
   padding: 0.5em 0;
   border-bottom: dashed 1px silver;
 }
+
+.btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  margin: auto;
+  margin-top: 1rem;
+  padding: 1rem 4rem;
+  font-weight: bold;
+  border-radius: 100vh;
+  border-bottom: 7px solid #0686b2;
+  background: #27acd9;
+  color: #fff;
+}
+.btn:hover {
+  margin-top: 6px;
+  border-bottom: 1px solid #0686b2;
+  color: #fff;
+}

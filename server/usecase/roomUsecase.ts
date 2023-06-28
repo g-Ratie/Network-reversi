@@ -151,6 +151,14 @@ export const roomUsecase = {
 
     return newRoom;
   },
+  join: async (roomid: string): Promise<RoomModel> => {
+    const room = await roomRepository.getRoom(roomid);
+    assert(room, 'クリックできてるんだから部屋があるはず');
+    const newRoom: RoomModel = { ...room, status: 'playing' };
+    await roomRepository.save(newRoom);
+    return newRoom;
+  },
+
   clickBoard: async (x: number, y: number, userId: UserId, roomid: string): Promise<RoomModel> => {
     //ここのボード選択をfindLatestからボードを取得するように変更する
     const room = await roomRepository.getRoom(roomid);

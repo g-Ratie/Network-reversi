@@ -26,12 +26,8 @@ const InfoPanel = () => {
     setRoomData(room.body);
   };
   useEffect(() => {
-    const getUserOnRoom = setInterval(fetchUserOnRoom, 500);
-    const getRoom = setInterval(fetchRoom, 500);
-    return () => {
-      clearInterval(getUserOnRoom);
-      clearInterval(getRoom);
-    };
+    fetchRoom();
+    fetchUserOnRoom();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   if (!userOnRoomData) return <p>loading</p>;

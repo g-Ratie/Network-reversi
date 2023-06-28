@@ -26,11 +26,10 @@ const Home = () => {
       <BasicHeader user={user} />
       <div className={styles.box}>
         <button className={styles.btn} onClick={createRoom}>
-          部屋を作る
+          部屋作る
         </button>
-        <button className={styles.btn}>部屋を探す</button>
-        <button className={styles.btn}>続きから</button>
         <GameListModal />
+        <button className={styles.btn}>続きから</button>
       </div>
     </>
   );
