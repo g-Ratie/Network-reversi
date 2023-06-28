@@ -11,7 +11,10 @@ const Home = () => {
   const router = useRouter();
 
   const createRoom = async () => {
+    if (!user) return;
     const room = await apiClient.rooms.$get();
+    console.log(new Date());
+    await apiClient.rooms.useronrooms.$post({ body: { roomid: room.id, firebaseid: user.id } });
     router.push(`/game/${room.id}`);
   };
 

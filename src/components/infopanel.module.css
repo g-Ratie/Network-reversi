@@ -1,0 +1,6 @@
+.infoPanel {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  border: solid;
+}
