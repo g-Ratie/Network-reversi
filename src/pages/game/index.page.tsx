@@ -2,6 +2,7 @@ import { useAtom } from 'jotai';
 import { useRouter } from 'next/router';
 import { userAtom } from 'src/atoms/user';
 import { Loading } from 'src/components/Loading/Loading';
+import GameListModal from 'src/components/game/gameListModal';
 import { BasicHeader } from 'src/pages/@components/BasicHeader/BasicHeader';
 import { apiClient } from 'src/utils/apiClient';
 import styles from './index.module.css';
@@ -29,6 +30,7 @@ const Home = () => {
         </button>
         <button className={styles.btn}>部屋を探す</button>
         <button className={styles.btn}>続きから</button>
+        <GameListModal />
       </div>
     </>
   );

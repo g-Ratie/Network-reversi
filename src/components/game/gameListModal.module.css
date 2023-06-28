@@ -1,0 +1,39 @@
+.overlay {
+  /*　画面全体を覆う設定　*/
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  /*　画面の中央に要素を表示させる設定　*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.content {
+  z-index: 2;
+  width: 80%;
+  padding: 1em;
+  background: #fff;
+  overflow: scroll;
+  height: 80%;
+  overflow: scroll;
+}
+
+.content > ul {
+  margin-bottom: 1em;
+  box-shadow: 0px 0px 3px silver;
+  border: solid 1px whitesmoke;
+  padding: 0.5em 1em 0.5em 2.3em;
+  position: relative;
+
+  background: #fafafa;
+}
+
+.content > ul > li {
+  line-height: 1.5;
+  padding: 0.5em 0;
+  border-bottom: dashed 1px silver;
+}
