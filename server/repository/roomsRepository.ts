@@ -30,11 +30,18 @@ export const roomRepository = {
     });
     return room && toRoomModel(room);
   },
-  getroom: async (roomid: string): Promise<RoomModel | null> => {
+  getRoom: async (roomid: string): Promise<RoomModel | null> => {
     const roomId = roomIdParser.parse(roomid);
     const room = await prismaClient.room.findUnique({
       where: { roomId },
     });
     return room && toRoomModel(room);
+  },
+  getWaitingRoomList: async (): Promise<RoomModel[]> => {
+    const rooms = await prismaClient.room.findMany({
+      where: { status: 'waiting' },
+    });
+    const roomModels = rooms.map(toRoomModel);
+    return roomModels;
   },
 };

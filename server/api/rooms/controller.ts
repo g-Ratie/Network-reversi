@@ -9,6 +9,6 @@ export default defineController(() => ({
   }),
   post: async ({ body }) => ({
     status: 200,
-    body: await roomRepository.getroom(body.roomid),
+    body: await roomRepository.getRoom(body.roomid),
   }),
 }));
