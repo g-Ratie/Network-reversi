@@ -20,3 +20,10 @@ export type RoomModel = {
   status: 'waiting' | 'playing' | 'ended';
   created: number;
 };
+
+export type UserOnRoomModel = {
+  firebaseId: string;
+  in: Date;
+  out: Date | null;
+  roomId: RoomId;
+};
