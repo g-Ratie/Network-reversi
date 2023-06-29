@@ -38,6 +38,40 @@
   border-bottom: dashed 1px silver;
 }
 
+.content > ul > li:hover {
+  background: #f0f0f0;
+  letter-spacing: 0.15em;
+}
+
+.square_btn {
+  display: block;
+  position: relative;
+  width: 30px;
+  height: 30px;
+  background: #333; /* ボタンの背景色 */
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.square_btn::before,
+.square_btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 25px;
+  background: #fff; /* バツ印の色 */
+}
+
+.square_btn::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.square_btn::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
 .btn {
   display: block;
   text-align: center;

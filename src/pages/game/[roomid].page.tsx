@@ -2,8 +2,8 @@ import { useAtom } from 'jotai';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { userAtom } from 'src/atoms/user';
-import InfoPanel from 'src/components/game/Infopanel';
 import { Loading } from 'src/components/Loading/Loading';
+import InfoPanel from 'src/components/game/Infopanel';
 import { BasicHeader } from 'src/pages/@components/BasicHeader/BasicHeader';
 import { apiClient } from 'src/utils/apiClient';
 import styles from './roomid.module.css';
@@ -49,7 +49,6 @@ const Home = () => {
   return (
     <>
       <BasicHeader user={user} />
-      <p>roomid:{roomid}</p>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <div className={styles.board}>
           {board.map((row, y) =>
@@ -68,8 +67,8 @@ const Home = () => {
             ))
           )}
         </div>
-        <InfoPanel />
       </div>
+      <InfoPanel />
       <p>{turn === 1 ? '黒' : '白'}のターン</p>
     </>
   );

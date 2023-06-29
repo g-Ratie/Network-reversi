@@ -37,6 +37,7 @@ const GameListModal = () => {
         <div className={styles.overlay}>
           <div className={styles.content}>
             <h3>ルームリスト</h3>
+            <span onClick={() => setShow(false)} className={styles.square_btn} />
             <ul>
               {roomDatas.map((roomData) => (
                 <li key={roomData.id} onClick={() => joinRoom(roomData.id)}>
@@ -44,7 +45,6 @@ const GameListModal = () => {
                 </li>
               ))}
             </ul>
-            <button onClick={() => setShow(false)}>close</button>
           </div>
         </div>
       </>
