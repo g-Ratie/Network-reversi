@@ -13,6 +13,15 @@ export const userOnRoomUsecase = {
     };
     await userOnRoomRepository.save(userOnRoom);
   },
+  getbyRoom: async (roomid: string): Promise<UserOnRoomModel[] | null> => {
+    const room = await roomRepository.getRoom(roomid);
+    if (room) {
+      const userOnRoomList = await userOnRoomRepository.findByRoom(roomid);
+      return userOnRoomList;
+    }
+    return null;
+  },
+
   //進行中のゲームがあるかどうか確かめる関数を用意する
   isInGame: async (firebaseId: string): Promise<UserOnRoomModel | null> => {
     const userOnRoom = await userOnRoomRepository.findLatestByUser(firebaseId);

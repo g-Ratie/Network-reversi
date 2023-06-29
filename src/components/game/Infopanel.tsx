@@ -1,14 +1,11 @@
 import type { RoomModel, UserOnRoomModel } from '$/commonTypesWithClient/models';
-import { useAtom } from 'jotai';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { userAtom } from 'src/atoms/user';
 import { apiClient } from 'src/utils/apiClient';
 import styles from './infopanel.module.css';
 
 const InfoPanel = () => {
   const router = useRouter();
-  const [user] = useAtom(userAtom);
   const { roomid } = router.query;
   const [userOnRoomData, setUserOnRoomData] = useState<UserOnRoomModel | null>();
   const [roomData, setRoomData] = useState<RoomModel | null>();
@@ -30,7 +27,14 @@ const InfoPanel = () => {
     fetchUserOnRoom();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  if (!userOnRoomData) return <p>loading</p>;
+  if (!userOnRoomData)
+    return (
+      <div className={styles.infoPanel}>
+        <p>status:{roomData?.status}</p>
+        <p>あなたは観戦者です</p>
+      </div>
+    );
+
   return (
     <div className={styles.infoPanel}>
       <p>userid:{userOnRoomData.firebaseId}</p>

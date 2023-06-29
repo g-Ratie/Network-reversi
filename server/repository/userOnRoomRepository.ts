@@ -38,4 +38,10 @@ export const userOnRoomRepository = {
     });
     return userOnRoom && toUserOnRoomModel(userOnRoom);
   },
+  findByRoom: async (roomid: string): Promise<UserOnRoomModel[]> => {
+    const userOnRooms = await prismaClient.userOnRoom.findMany({
+      where: { roomId: roomid },
+    });
+    return userOnRooms.map(toUserOnRoomModel);
+  },
 };

@@ -1,4 +1,4 @@
-import type { UserId } from '$/commonTypesWithClient/branded';
+import type { RoomId, UserId } from '$/commonTypesWithClient/branded';
 import type { RoomModel } from '$/commonTypesWithClient/models';
 import { roomRepository } from '$/repository/roomsRepository';
 import { roomIdParser } from '$/service/idParsers';
@@ -123,8 +123,14 @@ const resetSuggestions = (board: number[][]) => {
   });
 };
 
-export const clickBoard = (x: number, y: number, userid: UserId, board: BoardArray): BoardArray => {
-  const userColor = userColorUsecase.getUserColor(userid);
+export const clickBoard = async (
+  x: number,
+  y: number,
+  userid: UserId,
+  board: BoardArray,
+  roomid: RoomId
+): Promise<BoardArray> => {
+  const userColor = await userColorUsecase.getUserColorByRoomId(userid, roomid);
   const enemyColor = userColor === 1 ? 2 : 1;
   const canPutCells = CheckCanput(x, y, userColor, board);
 
@@ -159,13 +165,19 @@ export const roomUsecase = {
     return newRoom;
   },
 
-  clickBoard: async (x: number, y: number, userId: UserId, roomid: string): Promise<RoomModel> => {
+  clickBoard: async (x: number, y: number, userId: UserId, roomid: RoomId): Promise<RoomModel> => {
     //ここのボード選択をfindLatestからボードを取得するように変更する
     const room = await roomRepository.getRoom(roomid);
 
     assert(room, 'クリックできてるんだから部屋があるはず');
 
-    const newBoard: number[][] = clickBoard(x, y, userId, JSON.parse(JSON.stringify(room.board)));
+    const newBoard: number[][] = await clickBoard(
+      x,
+      y,
+      userId,
+      JSON.parse(JSON.stringify(room.board)),
+      roomid
+    );
 
     const newRoom: RoomModel = { ...room, board: newBoard };
 
