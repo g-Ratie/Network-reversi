@@ -36,6 +36,5 @@ export const userColorUsecase = {
       userColorDict.white = UserIdParser.parse(user_white?.firebaseId);
       return 2;
     }
-    //TODO 観戦者の場合は、0を返す
   },
 };

@@ -8,4 +8,5 @@ export type Methods = {
   post: {
     reqBody: { roomid: string; firebaseid: UserId };
   };
+  delete: { reqBody: { roomid: string } };
 };

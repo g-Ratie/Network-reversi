@@ -164,6 +164,13 @@ export const roomUsecase = {
     await roomRepository.save(newRoom);
     return newRoom;
   },
+  out: async (roomid: string): Promise<RoomModel> => {
+    const room = await roomRepository.getRoom(roomid);
+    assert(room, 'クリックできてるんだから部屋があるはず');
+    const newRoom: RoomModel = { ...room, status: 'ended' };
+    await roomRepository.save(newRoom);
+    return newRoom;
+  },
 
   clickBoard: async (x: number, y: number, userId: UserId, roomid: RoomId): Promise<RoomModel> => {
     //ここのボード選択をfindLatestからボードを取得するように変更する

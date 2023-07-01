@@ -9,6 +9,7 @@ const InfoPanel = () => {
   const { roomid } = router.query;
   const [userOnRoomData, setUserOnRoomData] = useState<UserOnRoomModel | null>();
   const [roomData, setRoomData] = useState<RoomModel | null>();
+  const [isEnded, setIsEnded] = useState(false);
 
   const fetchUserOnRoom = async () => {
     if (typeof roomid !== 'string') return;
@@ -21,12 +22,17 @@ const InfoPanel = () => {
     const room = await apiClient.rooms.post({ body: { roomid } });
     console.log(room);
     setRoomData(room.body);
+    if (room.body?.status === 'ended') setIsEnded(true);
   };
   useEffect(() => {
-    fetchRoom();
-    fetchUserOnRoom();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const getRoom = setInterval(fetchRoom, 500);
+    const getUserOnRoom = setInterval(fetchUserOnRoom, 500);
+    return () => {
+      clearInterval(getRoom);
+      clearInterval(getUserOnRoom);
+    };
   }, []);
+
   if (!userOnRoomData)
     return (
       <div className={styles.infoPanel}>
@@ -34,17 +40,24 @@ const InfoPanel = () => {
         <p>あなたは観戦者です</p>
       </div>
     );
-
-  return (
-    <div className={styles.infoPanel}>
-      <p>userid:{userOnRoomData.firebaseId}</p>
-      <p>roomid:{userOnRoomData.roomId}</p>
-      <p>in時刻:{userOnRoomData.in}</p>
-      <p>out時刻:{userOnRoomData.out}</p>
-      <p>status:{roomData?.status}</p>
-      <p>created_at:{roomData?.created}</p>
-    </div>
-  );
+  if (isEnded)
+    return (
+      <div className={styles.infoPanel}>
+        <p>status:{roomData?.status}</p>
+        <p>この試合は終了しました</p>
+      </div>
+    );
+  else
+    return (
+      <div className={styles.infoPanel}>
+        <p>userid:{userOnRoomData.firebaseId}</p>
+        <p>roomid:{userOnRoomData.roomId}</p>
+        <p>in時刻:{userOnRoomData.in}</p>
+        <p>out時刻:{userOnRoomData.out}</p>
+        <p>status:{roomData?.status}</p>
+        <p>created_at:{roomData?.created}</p>
+      </div>
+    );
 };
 
 export default InfoPanel;

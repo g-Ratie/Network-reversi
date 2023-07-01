@@ -17,16 +17,21 @@ const Home = () => {
 
   const fetchBoard = async () => {
     if (typeof roomid !== 'string') return;
-    console.log('fetchBoard', roomid);
     const room = await apiClient.rooms.post({ body: { roomid } });
     if (board !== null) setBoard(room.body?.board ?? []);
+  };
+
+  const outRoom = async () => {
+    if (!user) return;
+    const { roomid } = router.query;
+    if (typeof roomid !== 'string') return;
+    await apiClient.rooms.useronrooms.$delete({ body: { roomid } });
   };
 
   const clickCell = async (x: number, y: number) => {
     if (typeof roomid !== 'string') return;
     await apiClient.rooms.board.post({ body: { x, y, roomid } });
     await fetchBoard();
-    console.log('click', x, y);
   };
 
   const fetchTurn = async () => {
@@ -67,6 +72,9 @@ const Home = () => {
             ))
           )}
         </div>
+        <button className={styles.btn} onClick={outRoom}>
+          やめる
+        </button>
       </div>
       <InfoPanel />
       <p>{turn === 1 ? '黒' : '白'}のターン</p>

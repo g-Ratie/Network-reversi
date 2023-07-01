@@ -30,7 +30,12 @@ const GameListModal = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  if (!roomDatas) return <p>loading</p>;
+  if (!roomDatas)
+    return (
+      <button className={styles.btn} onClick={() => setShow(true)}>
+        部屋探す
+      </button>
+    );
   if (show)
     return (
       <>
