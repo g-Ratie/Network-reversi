@@ -1,76 +1,67 @@
-import type { TaskModel } from '$/commonTypesWithClient/models';
+import type { UserOnRoomModel } from '$/commonTypesWithClient/models';
 import { useAtom } from 'jotai';
-import type { ChangeEvent, FormEvent } from 'react';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { userAtom } from 'src/atoms/user';
 import { Loading } from 'src/components/Loading/Loading';
+import GameListModal from 'src/components/game/gameListModal';
 import { BasicHeader } from 'src/pages/@components/BasicHeader/BasicHeader';
 import { apiClient } from 'src/utils/apiClient';
-import { returnNull } from 'src/utils/returnNull';
-import { userAtom } from '../atoms/user';
 import styles from './index.module.css';
 
 const Home = () => {
   const [user] = useAtom(userAtom);
-  const [tasks, setTasks] = useState<TaskModel[] | undefined>(undefined);
-  const [label, setLabel] = useState('');
-  const inputLabel = (e: ChangeEvent<HTMLInputElement>) => {
-    setLabel(e.target.value);
-  };
-  const fetchTasks = async () => {
-    const tasks = await apiClient.tasks.$get().catch(returnNull);
+  const [latestUserOnRoom, setLatestUserOnRoom] = useState<UserOnRoomModel | null>(null);
+  const router = useRouter();
 
-    if (tasks !== null) setTasks(tasks);
+  const fetchLatestUserOnRoom = async () => {
+    if (typeof user?.id !== 'string') return;
+    const latestUserOnRoomdata = await apiClient.rooms.useronrooms.$get();
+    if (latestUserOnRoomdata !== null) setLatestUserOnRoom(latestUserOnRoomdata);
   };
-  const createTask = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!label) return;
 
-    await apiClient.tasks.post({ body: { label } });
-    setLabel('');
-    await fetchTasks();
-  };
-  const toggleDone = async (task: TaskModel) => {
-    await apiClient.tasks._taskId(task.id).patch({ body: { done: !task.done } });
-    await fetchTasks();
-  };
-  const deleteTask = async (task: TaskModel) => {
-    await apiClient.tasks._taskId(task.id).delete();
-    await fetchTasks();
+  const createRoom = async () => {
+    if (!user) return;
+    const room = await apiClient.rooms.$get();
+    console.log(new Date());
+    await apiClient.rooms.useronrooms.$post({ body: { roomid: room.id, firebaseid: user.id } });
+    router.push(`/game/${room.id}`);
   };
 
   useEffect(() => {
-    fetchTasks();
+    const getboard = setInterval(fetchLatestUserOnRoom, 500);
+    return () => {
+      clearInterval(getboard);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!tasks || !user) return <Loading visible />;
+  if (!user) return <Loading visible />;
+  if (latestUserOnRoom !== null && latestUserOnRoom?.out === null) {
+    return (
+      <>
+        <BasicHeader user={user} />
+        <div className={styles.box}>
+          <button
+            className={styles.btn}
+            onClick={() => router.push(`/game/${latestUserOnRoom.roomId}`)}
+          >
+            続きから
+          </button>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <BasicHeader user={user} />
-      <div className={styles.title} style={{ marginTop: '160px' }}>
-        Welcome to frourio!
+      <div className={styles.box}>
+        <button className={styles.btn} onClick={createRoom}>
+          部屋作る
+        </button>
+        <GameListModal />
       </div>
-
-      <form style={{ textAlign: 'center', marginTop: '80px' }} onSubmit={createTask}>
-        <input value={label} type="text" onChange={inputLabel} />
-        <input type="submit" value="ADD" />
-      </form>
-      <ul className={styles.tasks}>
-        {tasks.map((task) => (
-          <li key={task.id}>
-            <label>
-              <input type="checkbox" checked={task.done} onChange={() => toggleDone(task)} />
-              <span>{task.label}</span>
-            </label>
-            <input
-              type="button"
-              value="DELETE"
-              className={styles.deleteBtn}
-              onClick={() => deleteTask(task)}
-            />
-          </li>
-        ))}
-      </ul>
     </>
   );
 };
