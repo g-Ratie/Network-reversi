@@ -36,7 +36,7 @@ const Home = () => {
 
   const fetchTurn = async () => {
     const turn = await apiClient.turn.$get();
-    if (turn !== null) setTurn(turn);
+    setTurn(turn);
   };
 
   useEffect(() => {
@@ -46,8 +46,7 @@ const Home = () => {
       clearInterval(getboard);
       clearInterval(getturn);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   if (!user) return <Loading visible />;
 
@@ -77,7 +76,7 @@ const Home = () => {
         </button>
       </div>
       <InfoPanel />
-      <p>{turn === 1 ? '黒' : '白'}のターン</p>
+      <p>{turn}ターン目</p>
     </>
   );
 };

@@ -14,7 +14,6 @@ export const userOnRoomUsecase = {
     };
     await userOnRoomRepository.save(userOnRoom);
   },
-  //TODO 途中抜けされた相手側の処理が必要かも
   out: async (roomid: string) => {
     const userOnRooms = await userOnRoomRepository.findByRoom(roomid);
     userOnRooms.forEach(async (userOnRoom) => {
