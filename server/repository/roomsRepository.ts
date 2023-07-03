@@ -9,17 +9,20 @@ const toRoomModel = (prismaRoom: Room): RoomModel => ({
   board: z.array(z.array(z.number())).parse(prismaRoom.board),
   status: z.enum(['waiting', 'playing', 'ended']).parse(prismaRoom.status),
   created: prismaRoom.createdAt.getTime(),
+  //currentcolorは 0<currentColor<=2 であることを保証する
+  currentColor: z.number().min(1).max(2).parse(prismaRoom.currentColor) as 1 | 2,
 });
 
 export const roomRepository = {
   save: async (room: RoomModel) => {
     await prismaClient.room.upsert({
       where: { roomId: room.id },
-      update: { status: room.status, board: room.board },
+      update: { status: room.status, board: room.board, currentColor: room.currentColor },
       create: {
         roomId: room.id,
         board: room.board,
         status: room.status,
+        currentColor: room.currentColor,
         createdAt: new Date(room.created),
       },
     });

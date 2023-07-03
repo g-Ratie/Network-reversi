@@ -21,13 +21,6 @@ const initBoard = () => [
   [0, 0, 0, 0, 0, 0, 0, 0],
 ];
 
-const initBoardObj = () => {
-  const boardObj = {
-    board: initBoard(),
-    currentColor: 1,
-  };
-};
-
 const directions = [
   [0, -1],
   [1, -1],
@@ -38,7 +31,6 @@ const directions = [
   [-1, 0],
   [-1, -1],
 ];
-let turnColor: 1 | 2 = 1;
 
 const CheckCanput = (x: number, y: number, color: number, board: number[][]) => {
   const playerColor = color;
@@ -122,7 +114,7 @@ const resetSuggestions = (board: number[][]) => {
   });
 };
 
-export const clickBoard = async (
+const clickBoard = async (
   x: number,
   y: number,
   userid: UserId,
@@ -134,12 +126,12 @@ export const clickBoard = async (
   const userColor = await userColorUsecase.getUserColorByRoomId(userid, roomid);
   const enemyColor = userColor === 1 ? 2 : 1;
   const canPutCells = CheckCanput(x, y, userColor, board);
-  if (canPutCells.length !== 0 && turnColor === userColor) {
+  const room = await roomRepository.getRoom(roomid);
+  if (canPutCells.length !== 0 && room?.currentColor === userColor) {
     board[y][x] = userColor;
     canPutCells.forEach(([y, x]) => {
       board[y][x] = userColor;
     });
-    turnColor = turnColor === 1 ? 2 : 1;
     setSuggestions(board, enemyColor);
   }
   return board;
@@ -151,6 +143,7 @@ export const roomUsecase = {
       board: initBoard(),
       status: 'waiting',
       created: Date.now(),
+      currentColor: 1,
     };
     await roomRepository.save(newRoom);
     return newRoom;
@@ -180,13 +173,22 @@ export const roomUsecase = {
       JSON.parse(JSON.stringify(room.board)),
       roomid
     );
-    const newRoom: RoomModel = { ...room, board: newBoard };
+    const newCurrentColor = room.currentColor === 1 ? 2 : 1;
+    const newRoom: RoomModel = { ...room, board: newBoard, currentColor: newCurrentColor };
     await roomRepository.save(newRoom);
     return newRoom;
   },
-  getTurnColor: () => turnColor,
-  passTurnColor: () => {
-    turnColor = turnColor === 1 ? 2 : 1;
-    return turnColor;
+  getTurnColor: async (roomid: RoomId): Promise<number> => {
+    const room = await roomRepository.getRoom(roomid);
+    assert(room, 'クリックできてるんだから部屋があるはず');
+    return room.currentColor;
+  },
+  passTurnColor: async (roomid: RoomId): Promise<number> => {
+    const room = await roomRepository.getRoom(roomid);
+    assert(room, 'クリックできてるんだから部屋があるはず');
+    const newCurrentColor = room.currentColor === 1 ? 2 : 1;
+    const newRoom: RoomModel = { ...room, currentColor: newCurrentColor };
+    await roomRepository.save(newRoom);
+    return newCurrentColor;
   },
 };

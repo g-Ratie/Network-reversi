@@ -17,6 +17,7 @@ export type TaskModel = {
 export type RoomModel = {
   id: RoomId;
   board: number[][];
+  currentColor: 1 | 2;
   status: 'waiting' | 'playing' | 'ended';
   created: number;
 };

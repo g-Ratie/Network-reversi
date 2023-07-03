@@ -14,13 +14,12 @@ const InfoPanel = () => {
   const fetchUserOnRoom = async () => {
     if (typeof roomid !== 'string') return;
     const useronrooms = await apiClient.rooms.useronrooms.$get();
-    console.log(useronrooms);
     setUserOnRoomData(useronrooms);
   };
   const fetchRoom = async () => {
     if (typeof roomid !== 'string') return;
     const room = await apiClient.rooms.post({ body: { roomid } });
-    console.log(room);
+
     setRoomData(room.body);
     if (room.body?.status === 'ended') setIsEnded(true);
   };

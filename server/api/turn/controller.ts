@@ -1,7 +1,14 @@
+import { roomIdParser } from '$/service/idParsers';
 import { roomUsecase } from '$/usecase/roomUsecase';
 import { defineController } from './$relay';
 
 export default defineController(() => ({
-  get: () => ({ status: 200, body: roomUsecase.getTurnColor() }),
-  post: () => ({ status: 200, body: roomUsecase.passTurnColor() }),
+  get: async ({ query }) => ({
+    status: 200,
+    body: await roomUsecase.getTurnColor(roomIdParser.parse(query.roomid)),
+  }),
+  post: async ({ body }) => ({
+    status: 200,
+    body: await roomUsecase.passTurnColor(roomIdParser.parse(body.roomid)),
+  }),
 }));

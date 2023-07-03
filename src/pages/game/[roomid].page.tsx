@@ -35,7 +35,8 @@ const Home = () => {
   };
 
   const fetchTurn = async () => {
-    const turn = await apiClient.turn.$get();
+    if (typeof roomid !== 'string') return;
+    const turn = await apiClient.turn.$get({ query: { roomid } });
     setTurn(turn);
   };
 
